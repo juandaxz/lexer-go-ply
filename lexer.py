@@ -37,7 +37,8 @@ TOKENS_PUNTO_COMA = {
 # Palabras reservadas: las 25 de Go, repartidas entre los integrantes
 # ============================================================
 # --- MALDONADO BONILLA DIEGO ALEJANDRO (@dimaboni) ---
-reservadas_maldonado = {}   # Maldonado agrega aquí sus palabras reservadas
+reservadas_maldonado = {k: k.upper() for k in
+    ["for", "range", "break", "continue", "goto", "fallthrough", "defer"]}
 # --- VILLARROEL BENITEZ VICTOR ADRIAN (@vavillar) ---
 reservadas_villarroel = {}  # Villarroel agrega aquí sus palabras reservadas
 # --- FIERRO CARRION JUAN DIEGO (@juandaxz) ---
@@ -56,8 +57,11 @@ tipos_datos = {t: "TIPO" for t in [
 # ============================================================
 # Lista de tokens (cada integrante agrega los suyos)
 # ============================================================
-tokens_maldonado = []   # Maldonado agrega aquí sus tokens
-
+tokens_maldonado = [
+    "ID", "TIPO", "DEFINE",
+    "LPAREN", "RPAREN", "LBRACE", "RBRACE", "LBRACKET", "RBRACKET",
+    "COMMA", "SEMICOLON", "COLON", "DOT", "NEWLINE", "ERROR",
+]
 
 tokens_villarroel = []  # Villarroel agrega aquí sus tokens
 
@@ -102,7 +106,63 @@ def t_error(t):
 #   (pendiente: lo agrega Maldonado en su commit)
 # FIN aporte: MALDONADO BONILLA DIEGO ALEJANDRO
 # ============================================================
+def t_ID(t):
+    r"[A-Za-z_][A-Za-z0-9_]*"
+    if t.value in reservadas:
+        t.type = reservadas[t.value]
+    elif t.value in predeclarados:
+        t.type = predeclarados[t.value]
+    elif t.value in tipos_datos:
+        t.type = "TIPO"
+    return t
 
+
+def t_COMENTARIO_LINEA(t):
+    r"//[^\n]*"
+    pass  # se descarta
+
+
+def t_COMENTARIO_BLOQUE(t):
+    r"/\*(.|\n)*?\*/"
+    saltos = t.value.count("\n")
+    t.lexer.lineno += saltos
+    if saltos:  # un comentario con saltos de línea actúa como un salto de línea
+        t.type = "NEWLINE"
+        return t
+
+
+def t_COMENTARIO_BLOQUE_ERROR(t):
+    r"/\*(.|\n)*"
+    tok = _error(t, "comentario de bloque sin cerrar.")
+    t.lexer.lineno += t.value.count("\n")
+    return tok
+
+
+def t_NEWLINE(t):
+    r"\n+"
+    t.lexer.lineno += len(t.value)
+    return t
+
+
+t_DEFINE = r":="
+t_LPAREN = r"\("
+t_RPAREN = r"\)"
+t_LBRACE = r"\{"
+t_RBRACE = r"\}"
+t_LBRACKET = r"\["
+t_RBRACKET = r"\]"
+t_COMMA = r","
+t_SEMICOLON = r";"
+t_COLON = r":"
+t_DOT = r"\."
+
+
+def t_error(t):
+    errores.append((t.lexer.lineno, _columna(t),
+                    f"Error léxico (línea {t.lexer.lineno}, columna {_columna(t)}): "
+                    f"el carácter '{t.value[0]}' no es válido en Go."))
+    t.lexer.skip(1)
+    
 # ============================================================
 # INICIO aporte: VILLARROEL BENITEZ VICTOR ADRIAN (@vavillar)
 #   (pendiente: lo agrega Villarroel en su commit)
