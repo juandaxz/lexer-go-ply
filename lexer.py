@@ -40,7 +40,8 @@ TOKENS_PUNTO_COMA = {
 reservadas_maldonado = {k: k.upper() for k in
     ["for", "range", "break", "continue", "goto", "fallthrough", "defer"]}
 # --- VILLARROEL BENITEZ VICTOR ADRIAN (@vavillar) ---
-reservadas_villarroel = {}  # Villarroel agrega aquí sus palabras reservadas
+reservadas_villarroel = {k: k.upper() for k in
+    ["var", "if", "else", "return", "func", "package", "import"]}  # Villarroel agrega aquí sus palabras reservadas
 # --- FIERRO CARRION JUAN DIEGO (@juandaxz) ---
 reservadas_fierro = {k: k.upper() for k in
     ["const", "switch", "case", "default", "map", "chan", "interface",
@@ -63,7 +64,10 @@ tokens_maldonado = [
     "COMMA", "SEMICOLON", "COLON", "DOT", "NEWLINE", "ERROR",
 ]
 
-tokens_villarroel = []  # Villarroel agrega aquí sus tokens
+tokens_villarroel = [    "SLICE_TIPO",
+    "PLUS", "MINUS", "TIMES", "DIVIDE", "MOD",
+    "EQ", "NEQ", "LT", "LE", "GT", "GE",
+    "AND", "OR", "NOT", "CADENA", "RUNA",]  # Villarroel agrega aquí sus tokens
 
 
 tokens_fierro = [
@@ -168,7 +172,48 @@ def t_error(t):
 #   (pendiente: lo agrega Villarroel en su commit)
 # FIN aporte: VILLARROEL BENITEZ VICTOR ADRIAN
 # ============================================================
+t_SLICE_TIPO = r"\[\]"
+t_PLUS = r"\+"
+t_MINUS = r"-"
+t_TIMES = r"\*"
+t_DIVIDE = r"/"
+t_MOD = r"%"
+t_EQ = r"=="
+t_NEQ = r"!="
+t_LE = r"<="
+t_GE = r">="
+t_LT = r"<"
+t_GT = r">"
+t_AND = r"&&"
+t_OR = r"\|\|"
+t_NOT = r"!"
 
+
+def t_CADENA(t):
+    r'"([^"\\\n]|\\.)*"'
+    return t
+
+
+def t_CADENA_CRUDA(t):
+    r"`[^`]*`"
+    t.type = "CADENA"
+    t.lexer.lineno += t.value.count("\n")
+    return t
+
+
+def t_CADENA_SIN_CERRAR(t):
+    r'"([^"\\\n]|\\.)*'
+    return _error(t, "cadena sin cerrar.")
+
+
+def t_RUNA(t):
+    r"'([^'\\\n]|\\.)+'"
+    return t
+
+
+def t_RUNA_SIN_CERRAR(t):
+    r"'([^'\\\n]|\\.)*"
+    return _error(t, "literal de carácter sin cerrar.")
 # ============================================================
 # INICIO aporte: FIERRO CARRION JUAN DIEGO (@juandaxz)
 #   Asignación, ++/--, &, ..., números (y su error) y escritura del log
