@@ -41,7 +41,7 @@ reservadas_maldonado = {k: k.upper() for k in
     ["for", "range", "break", "continue", "goto", "fallthrough", "defer"]}
 # --- VILLARROEL BENITEZ VICTOR ADRIAN (@vavillar) ---
 reservadas_villarroel = {k: k.upper() for k in
-    ["var", "if", "else", "return", "func", "package", "import"]}  # Villarroel agrega aquí sus palabras reservadas
+    ["var", "if", "else", "return", "func", "package", "import"]}
 # --- FIERRO CARRION JUAN DIEGO (@juandaxz) ---
 reservadas_fierro = {k: k.upper() for k in
     ["const", "switch", "case", "default", "map", "chan", "interface",
@@ -64,10 +64,12 @@ tokens_maldonado = [
     "COMMA", "SEMICOLON", "COLON", "DOT", "NEWLINE", "ERROR",
 ]
 
-tokens_villarroel = [    "SLICE_TIPO",
+tokens_villarroel = [
+    "SLICE_TIPO",
     "PLUS", "MINUS", "TIMES", "DIVIDE", "MOD",
     "EQ", "NEQ", "LT", "LE", "GT", "GE",
-    "AND", "OR", "NOT", "CADENA", "RUNA",]  # Villarroel agrega aquí sus tokens
+    "AND", "OR", "NOT", "CADENA", "RUNA",
+]
 
 
 tokens_fierro = [
@@ -107,8 +109,6 @@ def t_error(t):
 
 # ============================================================
 # INICIO aporte: MALDONADO BONILLA DIEGO ALEJANDRO (@dimaboni)
-#   (pendiente: lo agrega Maldonado en su commit)
-# FIN aporte: MALDONADO BONILLA DIEGO ALEJANDRO
 # ============================================================
 def t_ID(t):
     r"[A-Za-z_][A-Za-z0-9_]*"
@@ -159,18 +159,12 @@ t_COMMA = r","
 t_SEMICOLON = r";"
 t_COLON = r":"
 t_DOT = r"\."
+# FIN aporte: MALDONADO BONILLA DIEGO ALEJANDRO
+# ============================================================
 
 
-def t_error(t):
-    errores.append((t.lexer.lineno, _columna(t),
-                    f"Error léxico (línea {t.lexer.lineno}, columna {_columna(t)}): "
-                    f"el carácter '{t.value[0]}' no es válido en Go."))
-    t.lexer.skip(1)
-    
 # ============================================================
 # INICIO aporte: VILLARROEL BENITEZ VICTOR ADRIAN (@vavillar)
-#   (pendiente: lo agrega Villarroel en su commit)
-# FIN aporte: VILLARROEL BENITEZ VICTOR ADRIAN
 # ============================================================
 t_SLICE_TIPO = r"\[\]"
 t_PLUS = r"\+"
@@ -214,6 +208,10 @@ def t_RUNA(t):
 def t_RUNA_SIN_CERRAR(t):
     r"'([^'\\\n]|\\.)*"
     return _error(t, "literal de carácter sin cerrar.")
+# FIN aporte: VILLARROEL BENITEZ VICTOR ADRIAN
+# ============================================================
+
+
 # ============================================================
 # INICIO aporte: FIERRO CARRION JUAN DIEGO (@juandaxz)
 #   Asignación, ++/--, &, ..., números (y su error) y escritura del log
