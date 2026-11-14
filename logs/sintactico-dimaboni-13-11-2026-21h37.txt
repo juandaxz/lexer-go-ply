@@ -1,0 +1,13 @@
+Analisis sintactico de: algoritmos/erroresSintactico1.go
+Usuario: dimaboni Fecha: 13/11/2026 21:37:02
+============================================================
+ERRORES LEXICOS (0)
+============================================================
+(sin errores)
+
+============================================================
+ERRORES SINTACTICOS (3)
+============================================================
+Error sintáctico (línea 13): se encontró ';' (SEMICOLON) y no es válido en esa posición.
+Error sintáctico (línea 18): se encontró ';' (SEMICOLON) y no es válido en esa posición.
+Error sintáctico (línea 23): se encontró '*' (TIMES) y no es válido en esa posición.
