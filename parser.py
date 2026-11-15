@@ -343,6 +343,55 @@ def p_sent_ret(p):
 # expresion, tipo, tipo_ret, sent_ret).
 # ============================================================
 
+def p_decl_var(p):
+    """decl_var : VAR ID tipo ASSIGN expresion
+    | VAR ID tipo
+    | VAR ID ASSIGN expresion"""
+    if len(p) == 6:
+        p[0] = ("var", p[2], p[3], p[5])
+    elif len(p) == 4:
+        p[0] = ("var", p[2], p[3], None)
+    else:
+        p[0] = ("var", p[2], None, p[4])
+
+
+# --- if / else:  if x > 3 { } else if ... { } else { } ---
+def p_sent_if(p):
+    """sent_if : IF expresion bloque
+    | IF expresion bloque ELSE bloque
+    | IF expresion bloque ELSE sent_if"""
+    p[0] = ("if", p[2], p[3], p[5] if len(p) == 6 else None)
+
+
+# --- slice:  numeros := []int{1, 2, 3} ---
+def p_tipo_slice(p):
+    """tipo_slice : SLICE_TIPO TIPO"""
+    p[0] = ("slice", p[2])
+
+
+def p_slice_lit(p):
+    """slice_lit : tipo_slice LBRACE lista_expr RBRACE
+    | tipo_slice LBRACE RBRACE"""
+    p[0] = ("slice_lit", p[1], p[3] if len(p) == 5 else [])
+
+
+# --- función con varios valores de retorno (Villarroel): lista_tipos y sent_ret ---
+def p_lista_tipos(p):
+    """lista_tipos : lista_tipos COMMA tipo
+    | tipo"""
+    p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
+
+
+def p_sent_ret(p):
+    """sent_ret : RETURN lista_expr
+    | RETURN"""
+    p[0] = ("return", p[2] if len(p) == 3 else [])
+
+
+def p_sent_simple_multiple(p):
+    """sent_simple : ID COMMA ID DEFINE expresion"""
+    p[0] = ("declara_multiple", [p[1], p[3]], p[5])
+
 
 # FIN aporte: VILLARROEL BENITEZ VICTOR ADRIAN
 # ============================================================
@@ -501,4 +550,4 @@ if __name__ == "__main__":
         codigo = f.read()
     _, lex_err, sin_err = analizar(codigo)
     ruta = escribir_log(fuente, usuario, lex_err, sin_err)
-    print(f"{len(lex_err)} errores léxicos, {len(sin_err)} sintácticos -> {ruta}")
+    print(f"{len(lex_err)} errores léxicos, {len(sin_err)} sintácticos -> {ruta}")
