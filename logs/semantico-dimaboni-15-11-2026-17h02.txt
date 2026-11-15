@@ -1,0 +1,13 @@
+Analisis semantico de: algoritmos/erroresSemantico1.go
+Usuario: dimaboni Fecha: 15/11/2026 17:02:09
+============================================================
+ERRORES SEMANTICOS (8)
+============================================================
+Error semántico [Asignación de tipo] línea 10: no se puede asignar un valor de tipo 'string' a la variable 'edad' de tipo 'int'.
+Error semántico [Asignación de tipo] línea 12: no se puede asignar un valor de tipo 'int' a la variable 'nombre' de tipo 'string'.
+Error semántico [Asignación de tipo] línea 14: no se puede asignar un valor de tipo 'bool' a la variable 'precio' de tipo 'float64'.
+Error semántico [Asignación de tipo] línea 19: no se puede asignar un valor de tipo 'string' a la variable 'edad' declarada como 'int'.
+Error semántico [Asignación de tipo] línea 20: no se puede asignar un valor de tipo 'bool' a la variable 'talla' declarada como 'float64'.
+Error semántico [Estructuras de control] línea 27: 'continue' solo puede usarse dentro de un for.
+Error semántico [Estructuras de control] línea 29: 'break' solo puede usarse dentro de un for o un switch.
+Error semántico [Estructuras de control] línea 36: 'continue' solo puede usarse dentro de un for.

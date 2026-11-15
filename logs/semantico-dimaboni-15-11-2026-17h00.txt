@@ -1,0 +1,6 @@
+Analisis semantico de: algoritmos/algoritmoSemantico1.go
+Usuario: dimaboni Fecha: 15/11/2026 17:00:21
+============================================================
+ERRORES SEMANTICOS (0)
+============================================================
+(sin errores)

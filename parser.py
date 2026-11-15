@@ -65,10 +65,11 @@ def p_declaraciones(p):
 
 # declaraciones globales:
 #   decl_func -> Maldonado
-#   Villarroel: agregar aquí  decl_var SEMICOLON
+#   Villarroel: decl_var SEMICOLON (enlazado)
 #   Fierro:     decl_const SEMICOLON (agregado)
 def p_declaracion(p):
     """declaracion : decl_func SEMICOLON
+    | decl_var SEMICOLON
     | decl_const SEMICOLON"""
     p[0] = p[1]
 
@@ -91,13 +92,15 @@ def p_sentencias(p):
 
 # sentencia:
 #   sent_simple, sent_for, sent_salto, sent_ret -> Maldonado
-#   Villarroel: agregar aquí  decl_var SEMICOLON  y  sent_if SEMICOLON
+#   Villarroel: decl_var SEMICOLON  y  sent_if SEMICOLON (enlazados)
 #   Fierro:     decl_const SEMICOLON  y  sent_switch SEMICOLON (agregados)
 def p_sentencia(p):
     """sentencia : sent_simple SEMICOLON
     | sent_for SEMICOLON
     | sent_salto SEMICOLON
     | sent_ret SEMICOLON
+    | decl_var SEMICOLON
+    | sent_if SEMICOLON
     | decl_const SEMICOLON
     | sent_switch SEMICOLON"""
     p[0] = p[1]
@@ -139,7 +142,7 @@ def p_expresion_grupo(p):
 
 
 # acceso y arreglo_lit -> Maldonado
-#   Villarroel: agregar aquí  slice_lit
+#   Villarroel: slice_lit (enlazado)
 #   Fierro:     mapa_lit (agregado)
 def p_expresion_atomo(p):
     """expresion : ID
@@ -154,6 +157,7 @@ def p_expresion_atomo(p):
     | conversion
     | acceso
     | arreglo_lit
+    | slice_lit
     | mapa_lit"""
     p[0] = p[1]
 
@@ -167,7 +171,7 @@ def p_conversion(p):
 def p_llamada(p):
     """llamada : ID LPAREN args RPAREN
     | ID DOT ID LPAREN args RPAREN"""
-    p[0] = ("llamada", p[1] if len(p) == 5 else f"{p[1]}.{p[3]}")
+    p[0] = ("llamada", p[1] if len(p) == 5 else f"{p[1]}.{p[3]}", p[3] if len(p) == 5 else p[5])
 
 
 def p_args(p):
@@ -219,11 +223,12 @@ def p_sent_simple_llamada(p):
 
 
 # tipos: TIPO y tipo_arreglo [n]T -> Maldonado
-#   Villarroel: agregar aquí  tipo_slice  ([]T)
+#   Villarroel: tipo_slice  ([]T) (enlazado)
 #   Fierro:     tipo_mapa   (map[K]V) (agregado)
 def p_tipo(p):
     """tipo : TIPO
     | tipo_arreglo
+    | tipo_slice
     | tipo_mapa"""
     p[0] = p[1]
 
@@ -314,18 +319,15 @@ def p_param(p):
         p[0] = (p[1], ("variadico", p[3]))
 
 
-# Villarroel: agregar aquí  LPAREN lista_tipos RPAREN  (varios valores de retorno)
+# Villarroel: LPAREN lista_tipos RPAREN  (varios valores de retorno) (enlazado)
 def p_tipo_ret(p):
     """tipo_ret : tipo
+    | LPAREN lista_tipos RPAREN
     | empty"""
-    p[0] = p[1]
+    p[0] = p[1] if len(p) == 2 else ("tipos", p[2])
 
 
-# Villarroel: ampliar a varios valores (RETURN lista_expr)
-def p_sent_ret(p):
-    """sent_ret : RETURN expresion
-    | RETURN"""
-    p[0] = ("return", p[2] if len(p) == 3 else None)
+# return: la regla está en el bloque de Villarroel (RETURN lista_expr | RETURN)
 
 
 # FIN aporte: MALDONADO BONILLA DIEGO ALEJANDRO
