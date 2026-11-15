@@ -1,0 +1,13 @@
+Analisis sintactico de: algoritmos/erroresSintactico2.go
+Usuario: juandaxz Fecha: 14/11/2026 23:12:03
+============================================================
+ERRORES LEXICOS (0)
+============================================================
+(sin errores)
+
+============================================================
+ERRORES SINTACTICOS (3)
+============================================================
+Error sintáctico (línea 9): se encontró ';' (SEMICOLON) y no es válido en esa posición.
+Error sintáctico (línea 11): se encontró 'default' (DEFAULT) y no es válido en esa posición.
+Error sintáctico (línea 14): se encontró 'edades' (ID) y no es válido en esa posición.
