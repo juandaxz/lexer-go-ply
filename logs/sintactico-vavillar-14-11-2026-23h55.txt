@@ -1,0 +1,14 @@
+Analisis sintactico de: algoritmos/erroresSintactico3.go
+Usuario: vavillar Fecha: 14/11/2026 23:55:38
+============================================================
+ERRORES LEXICOS (0)
+============================================================
+(sin errores)
+
+============================================================
+ERRORES SINTACTICOS (4)
+============================================================
+Error sintáctico (línea 7): se encontró ';' (SEMICOLON) y no es válido en esa posición.
+Error sintáctico (línea 8): se encontró '*' (TIMES) y no es válido en esa posición.
+Error sintáctico (línea 9): se encontró ',' (COMMA) y no es válido en esa posición.
+Error sintáctico (línea 10): se encontró 'r' (ID) y no es válido en esa posición.
