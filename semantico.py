@@ -438,11 +438,39 @@ def regla_salto_en_ciclo(ctx, nodo):
 # Identificadores y Asignación de tipo (constantes)
 # ============================================================
 
-# Fierro: aquí van sus reglas semánticas (Identificadores y constantes no
-# modificables). Cada regla es una función regla(ctx, nodo) y se agrega a
-# reglas_fierro más abajo. Nodos útiles: ("id", nombre) por cada identificador
-# usado, ("llamada", nombre, args), ("asigna", op, nombre, e), ("incdec", op, nombre);
-# ctx.buscar(nombre) devuelve el símbolo (con .es_const) o None.
+# Funciones de Go que se pueden llamar sin declararlas en el programa.
+FUNCIONES_PREDEFINIDAS = {"len", "cap", "append", "copy", "delete", "make", "new",
+                          "print", "println", "panic", "recover", "min", "max"}
+
+
+# --- Regla 1 [Identificadores]: todo identificador debe estar declarado antes de
+#     usarse. También se revisa que la función llamada exista.
+#     Ejemplo con error:  total = total + bono   (bono no fue declarado)
+def regla_identificador_declarado(ctx, nodo):
+    if nodo[0] == "id":
+        nombre = nodo[1]
+        if nombre != "_" and ctx.buscar(nombre) is None and nombre not in ctx.funciones:
+            ctx.error("Identificadores",
+                      f"el identificador '{nombre}' se usa sin haber sido declarado.")
+    elif nodo[0] == "llamada" and "." not in nodo[1]:  # fmt.Println y similares no se revisan
+        nombre = nodo[1]
+        if (nombre not in ctx.funciones and nombre not in FUNCIONES_PREDEFINIDAS
+                and ctx.buscar(nombre) is None):
+            ctx.error("Identificadores",
+                      f"la función '{nombre}' se llama pero no está declarada.")
+
+
+# --- Regla 2 [Constantes no modificables]: una constante no puede cambiar su valor
+#     después de declararse (=, +=, -=, *=, /=, %=, ++ y --).
+#     Ejemplo con error:  const limite = 100 ... limite = 200
+def regla_constante_no_modificable(ctx, nodo):
+    if nodo[0] in ("asigna", "incdec"):  # en ambos nodos el nombre está en la posición 2
+        simbolo = ctx.buscar(nodo[2]) if ctx.es_identificador(nodo[2]) else None
+        if simbolo is not None and simbolo.es_const:
+            accion = f"asignar con '{nodo[1]}'" if nodo[0] == "asigna" else f"usar '{nodo[1]}' sobre"
+            ctx.error("Constantes",
+                      f"no se puede {accion} la constante '{nodo[2]}' "
+                      f"(declarada en la línea {simbolo.linea}), su valor no puede cambiar.")
 
 # FIN aporte: FIERRO CARRION JUAN DIEGO
 # ============================================================
@@ -453,7 +481,7 @@ def regla_salto_en_ciclo(ctx, nodo):
 # ============================================================
 reglas_maldonado = [regla_asignacion_tipo, regla_salto_en_ciclo]  # Maldonado agrega aquí sus reglas
 reglas_villarroel = []  # Villarroel agrega aquí sus reglas
-reglas_fierro = []  # Fierro agrega aquí sus reglas
+reglas_fierro = [regla_identificador_declarado, regla_constante_no_modificable]  # Fierro agrega aquí sus reglas
 
 REGLAS = reglas_maldonado + reglas_villarroel + reglas_fierro
 
