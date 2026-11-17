@@ -1,0 +1,15 @@
+Analisis semantico de: algoritmos/erroresSemantico2.go
+Usuario: juandaxz Fecha: 16/11/2026 23:24:18
+============================================================
+ERRORES SEMANTICOS (10)
+============================================================
+Error semántico [Identificadores] línea 13: el identificador 'bono' se usa sin haber sido declarado.
+Error semántico [Identificadores] línea 14: el identificador 'descuento' se usa sin haber sido declarado.
+Error semántico [Identificadores] línea 15: la función 'calcular' se llama pero no está declarada.
+Error semántico [Identificadores] línea 24: el identificador 'interno' se usa sin haber sido declarado.
+Error semántico [Constantes] línea 29: no se puede asignar con '=' la constante 'maximo' (declarada en la línea 28), su valor no puede cambiar.
+Error semántico [Constantes] línea 30: no se puede asignar con '+=' la constante 'maximo' (declarada en la línea 28), su valor no puede cambiar.
+Error semántico [Constantes] línea 31: no se puede usar '++' sobre la constante 'maximo' (declarada en la línea 28), su valor no puede cambiar.
+Error semántico [Constantes] línea 32: no se puede asignar con '=' la constante 'limite' (declarada en la línea 8), su valor no puede cambiar.
+Error semántico [Constantes] línea 33: no se puede usar '--' sobre la constante 'limite' (declarada en la línea 8), su valor no puede cambiar.
+Error semántico [Constantes] línea 34: no se puede asignar con '=' la constante 'Saludo' (declarada en la línea 9), su valor no puede cambiar.
