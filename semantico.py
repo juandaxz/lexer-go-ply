@@ -429,6 +429,122 @@ def regla_salto_en_ciclo(ctx, nodo):
 # agrega a reglas_villarroel más abajo. Nodos útiles: ("binop", op, izq, der),
 # ("unop", op, e), ("return", valores); ctx.funcion_actual = (nombre, tipos).
 
+ARITMETICOS = ("+", "-", "*", "/", "%")
+LOGICOS = ("&&", "||")
+ORDEN = ("<", "<=", ">", ">=")
+
+
+# --- Regla 1 [Operaciones permitidas]: cada operador solo se aplica a los
+#     tipos que lo admiten y ambos operandos deben ser del mismo tipo.
+#       * + - * /  -> numéricos del mismo tipo ('+' también string + string)
+#       * %        -> solo enteros
+#       * / y % entre la constante 0 -> división entre cero
+#       * && || !  -> solo bool
+#       * < <= > >= -> números o strings del mismo tipo;  == != -> mismo tipo
+#     Ejemplos con error:  "hola" - 3   |   edad && true   |   precio % 2   |   x / 0
+def regla_operaciones_permitidas(ctx, nodo):
+    if nodo[0] == "binop":
+        op, izq, der = nodo[1], nodo[2], nodo[3]
+        if op in ("/", "%") and der == 0:
+            ctx.error("Operaciones permitidas", f"división entre cero en la operación '{op}'.")
+            return
+        ti, td = ctx.tipo_de(izq), ctx.tipo_de(der)
+        if ti is None or td is None:  # tipo desconocido: no se puede verificar
+            return
+        if op in LOGICOS:
+            for t in (ti, td):
+                if t != "bool":
+                    ctx.error("Operaciones permitidas",
+                              f"el operador '{op}' requiere operandos 'bool', se encontró '{t}'.")
+                    return
+            return
+        if op in ARITMETICOS:
+            permitido = NUMERICOS | ({"string"} if op == "+" else set())
+            for t in (ti, td):
+                if t not in permitido:
+                    ctx.error("Operaciones permitidas",
+                              f"el operador '{op}' no está definido para el tipo '{t}'.")
+                    return
+            if op == "%" and (ti not in ENTEROS or td not in ENTEROS):
+                ctx.error("Operaciones permitidas",
+                          f"el operador '%' solo se aplica a enteros, se encontró '{ti}' % '{td}'.")
+                return
+        if op in ORDEN:
+            for t in (ti, td):
+                if t not in NUMERICOS | {"string"}:
+                    ctx.error("Operaciones permitidas",
+                              f"el operador '{op}' no se puede usar con el tipo '{t}'.")
+                    return
+        # mismos tipos (una constante sin tipo, como 2 o 3.5, se adapta al otro lado)
+        if ti != td and not (ctx.compatible(ti, der) or ctx.compatible(td, izq)) \
+                and "nil" not in (ti, td):
+            ctx.error("Operaciones permitidas",
+                      f"tipos distintos en '{op}': '{ti}' y '{td}'.")
+    elif nodo[0] == "unop":
+        t = ctx.tipo_de(nodo[2])
+        if t is None:
+            return
+        if nodo[1] == "!" and t != "bool":
+            ctx.error("Operaciones permitidas", f"el operador '!' requiere 'bool', se encontró '{t}'.")
+        elif nodo[1] == "-" and t not in NUMERICOS:
+            ctx.error("Operaciones permitidas", f"el operador '-' no está definido para el tipo '{t}'.")
+
+
+def _termina(sentencias):
+    """True si la lista de sentencias siempre termina en return (o en un for sin condición)."""
+    if not sentencias:
+        return False
+    ultima = sentencias[-1]
+    if not isinstance(ultima, tuple):
+        return False
+    if ultima[0] == "return" or ultima[0] == "for_infinito":
+        return True
+    if ultima[0] == "bloque":
+        return _termina(ultima[1])
+    if ultima[0] == "if":
+        otro = ultima[3]
+        if otro is None:
+            return False
+        return _termina(ultima[2][1]) and _termina([otro])
+    return False
+
+
+# --- Regla 2 [Retorno de funciones]:
+#       * el return debe devolver tantos valores como tipos declara la función
+#       * cada valor devuelto debe ser del tipo declarado en su posición
+#       * una función con tipo de retorno debe terminar en return
+#       * en  a, b := f()  f debe devolver exactamente 2 valores
+#     Ejemplos con error:  func f() (int, int) { return 1 }
+#                          func g() int { return "hola" }
+#                          func h() int { x := 1 }
+def regla_retorno_funciones(ctx, nodo):
+    if nodo[0] == "return" and ctx.funcion_actual:
+        nombre, tipos = ctx.funcion_actual
+        valores = valores_return(nodo)
+        if len(valores) != len(tipos):
+            ctx.error("Retorno de funciones",
+                      f"la función '{nombre}' debe devolver {len(tipos)} valor(es) "
+                      f"y el return tiene {len(valores)}.")
+            return
+        for i, (t, v) in enumerate(zip(tipos, valores), start=1):
+            if not ctx.compatible(t, v):
+                ctx.error("Retorno de funciones",
+                          f"el valor {i} del return en '{nombre}' es de tipo '{ctx.tipo_de(v)}' "
+                          f"y la función declara '{t}'.")
+    elif nodo[0] == "func":
+        tipos = ctx._retornos(nodo[3])
+        if tipos and not _termina(nodo[4][1]):
+            ctx.error("Retorno de funciones",
+                      f"a la función '{nodo[1]}' le falta un return al final "
+                      f"(declara devolver {', '.join(tipos)}).")
+    elif nodo[0] == "declara_multiple":
+        e = nodo[2]
+        if isinstance(e, tuple) and e[0] == "llamada" and e[1] in ctx.funciones:
+            n = len(ctx.funciones[e[1]])
+            if n != len(nodo[1]):
+                ctx.error("Retorno de funciones",
+                          f"se asignan {len(nodo[1])} variables pero '{e[1]}' devuelve {n} valor(es).")
+
 # FIN aporte: VILLARROEL BENITEZ VICTOR ADRIAN
 # ============================================================
 

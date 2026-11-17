@@ -1,0 +1,6 @@
+Analisis semantico de: algoritmos/algoritmoSemantico3.go
+Usuario: vavillar Fecha: 16/11/2026 23:17:31
+============================================================
+ERRORES SEMANTICOS (0)
+============================================================
+(sin errores)
