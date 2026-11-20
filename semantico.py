@@ -596,7 +596,7 @@ def regla_constante_no_modificable(ctx, nodo):
 # Reglas activas (cada integrante agrega las suyas en su lista)
 # ============================================================
 reglas_maldonado = [regla_asignacion_tipo, regla_salto_en_ciclo]  # Maldonado agrega aquí sus reglas
-reglas_villarroel = []  # Villarroel agrega aquí sus reglas
+reglas_villarroel = [regla_operaciones_permitidas, regla_retorno_funciones]  # Villarroel agrega aquí sus reglas
 reglas_fierro = [regla_identificador_declarado, regla_constante_no_modificable]  # Fierro agrega aquí sus reglas
 
 REGLAS = reglas_maldonado + reglas_villarroel + reglas_fierro
